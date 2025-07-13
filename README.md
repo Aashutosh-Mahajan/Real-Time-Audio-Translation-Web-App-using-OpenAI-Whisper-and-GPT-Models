@@ -20,6 +20,7 @@ A Flask-based web app that lets users upload audio in any language and receive t
 
 ---
 ## 📁 Structure
+audio-translate-app/
 ├── app.py
 ├── .env
 ├── requirements.txt
