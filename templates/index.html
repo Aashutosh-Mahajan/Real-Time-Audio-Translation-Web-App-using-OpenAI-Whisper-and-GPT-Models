@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio File Upload & Language Selection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .file-drop-zone {
+            transition: all 0.3s ease;
+        }
+        .file-drop-zone:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .file-drop-zone.dragover {
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+        .language-option {
+            transition: all 0.2s ease;
+        }
+        .language-option:hover {
+            transform: scale(1.02);
+        }
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen py-8">
+    <div class="max-w-2xl mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Audio File Processor</h1>
+            <p class="text-gray-600">Upload your audio file and select target language</p>
+        </div>
+
+        <!-- Main Form -->
+        <form id="audioForm" action="/upload" method="POST" enctype="multipart/form-data" class="space-y-8">
+            <!-- Audio File Upload Section -->
+            <div class="space-y-4">
+                <label class="block text-lg font-semibold text-gray-700 mb-3">
+                    📁 Upload Audio File
+                </label>
+                
+                <!-- File Drop Zone -->
+                <div id="dropZone" class="file-drop-zone border-3 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50 cursor-pointer">
+                    <div class="space-y-4">
+                        <div class="text-6xl">🎵</div>
+                        <div>
+                            <p class="text-lg font-medium text-gray-700">Drop your audio file here</p>
+                            <p class="text-sm text-gray-500">or click to browse</p>
+                        </div>
+                        <div class="text-xs text-gray-400">
+                            Supported formats: MP3, WAV, M4A, FLAC (Max 50MB)
+                        </div>
+                    </div>
+                </div>
+                
+                <input type="file" id="audioFile" name="audioFile" accept="audio/*" class="hidden" required>
+                
+                <!-- Selected File Display -->
+                <div id="fileInfo" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">🎧</span>
+                            <div>
+                                <p id="fileName" class="font-medium text-gray-800"></p>
+                                <p id="fileSize" class="text-sm text-gray-600"></p>
+                            </div>
+                        </div>
+                        <button type="button" id="removeFile" class="text-red-500 hover:text-red-700 font-medium">
+                            ✕ Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Language Selection Section -->
+            <div class="space-y-4">
+                <label for="languageSelect" class="block text-lg font-semibold text-gray-700 mb-3">
+                    🌍 Select Target Language
+                </label>
+                
+                <select id="languageSelect" name="language" required class="w-full p-4 border-2 border-gray-300 rounded-xl text-gray-700 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 text-lg">
+                    <option value="">Choose a language...</option>
+                    <option value="english">English</option>
+                    <option value="spanish">Spanish</option>
+                    <option value="french">French</option>
+                    <option value="german">German</option>
+                    <option value="chinese">Chinese</option>
+                    <option value="japanese">Japanese</option>
+                    <option value="italian">Italian</option>
+                    <option value="portuguese">Portuguese</option>
+                    <option value="russian">Russian</option>
+                    <option value="arabic">Arabic</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="korean">Korean</option>
+                </select>
+            </div>
+                            <!-- Submit Button -->
+            <div class="pt-4">
+                <button type="submit" class="submit-btn w-full py-4 px-6 text-white font-semibold rounded-xl text-lg">
+                    🚀 Process Audio File
+                </button>
+            </div>
+            <!-- Translated Text Output -->
+<div id="translatedTextSection" class="space-y-4 {% if not result_text %}hidden{% endif %}">
+    <label for="translatedText" class="block text-lg font-semibold text-gray-700 mb-3">
+        📝 Translated Text
+    </label>
+
+    <div class="relative">
+        <textarea 
+            id="translatedText" 
+            name="translatedText" 
+            rows="8" 
+            readonly
+            placeholder="Your translated text will appear here..."
+            class="w-full p-4 border-2 border-gray-300 rounded-xl text-gray-700 bg-gray-50 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all duration-200 resize-none"
+        >{{ result_text or '' }}</textarea>
+
+        <!-- Copy Button -->
+        <button 
+            type="button" 
+            id="copyBtn" 
+            class="absolute top-3 right-3 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg text-sm font-medium transition-colors duration-200"
+            onclick="copyText()"
+        >
+            📋 Copy
+        </button>
+    </div>
+
+    <!-- Word Count -->
+    <div class="flex justify-between text-sm text-gray-500">
+        <span id="wordCount">{{ result_text.split() | length if result_text else 0 }} words</span>
+        <span id="charCount">{{ result_text | length if result_text else 0 }} characters</span>
+    </div>
+</div>
+
+        </form>
+    </div>
+    <script>
+const dropZone = document.getElementById("dropZone");
+const fileInput = document.getElementById("audioFile");
+const fileInfo = document.getElementById("fileInfo");
+const fileName = document.getElementById("fileName");
+const fileSize = document.getElementById("fileSize");
+const removeFile = document.getElementById("removeFile");
+
+dropZone.addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) showFile(file);
+});
+
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    fileInput.files = e.dataTransfer.files;
+    if (file) showFile(file);
+});
+
+function showFile(file) {
+    if (file.size > 50 * 1024 * 1024) {
+        alert("File size exceeds 50MB limit.");
+        fileInput.value = '';
+        return;
+    }
+
+    fileName.textContent = file.name;
+    fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+    dropZone.classList.add("hidden");
+    fileInfo.classList.remove("hidden");
+}
+
+removeFile.addEventListener("click", () => {
+    fileInput.value = '';
+    dropZone.classList.remove("hidden");
+    fileInfo.classList.add("hidden");
+});
+function copyText() {
+    const textArea = document.getElementById("translatedText");
+    textArea.select();
+    document.execCommand("copy");
+    alert("Copied to clipboard!");
+}
+</script>
