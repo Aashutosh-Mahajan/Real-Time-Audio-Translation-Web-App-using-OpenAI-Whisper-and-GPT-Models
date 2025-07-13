@@ -15,7 +15,7 @@ A Flask-based web app that lets users upload audio in any language and receive t
 
 - **Backend**: Flask (Python)
 - **APIs**: OpenAI Whisper, GPT-4.1-mini
-- **Frontend**: HTML (Jinja2 + TailwindCSS)
+- **Frontend**: HTML,CSS & JS
 - **Env Management**: python-dotenv
 
 ---
