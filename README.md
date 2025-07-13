@@ -19,3 +19,10 @@ A Flask-based web app that lets users upload audio in any language and receive t
 - **Env Management**: python-dotenv
 
 ---
+## 📁 Structure
+├── app.py
+├── .env
+├── requirements.txt
+├── templates/
+│   └── index.html
+├── static/
