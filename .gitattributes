@@ -1,0 +1,6 @@
+# Count only Python files
+*.py linguist-detectable=true
+*.py linguist-language=Python
+
+# Ignore everything else
+*.html linguist-detectable=false
